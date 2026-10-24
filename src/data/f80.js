@@ -6,6 +6,7 @@ export default {
   rooms: {
     A: {
       scene: 1, name: 'Landing',
+      logo: [6, 3.5],
       onEnter: [{ msg: 'Bump the yellow switch to open the door.', time: 4 }],
       map: [
         '############',
@@ -70,6 +71,7 @@ export default {
     },
     D: {
       scene: 3, name: 'Security Corridor',
+      logo: [7.5, 5],
       onEnter: [{ msg: 'Trackers shrug off your laser. Keep moving!', time: 4 }],
       map: [
         '###z########',

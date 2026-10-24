@@ -31,7 +31,7 @@ html, body {
   touch-action: none;
 }
 
-#sky, #game {
+#game {
   position: fixed;
   inset: 0;
   display: block;

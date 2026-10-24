@@ -2,7 +2,7 @@
 // The renderer, HUD and audio read `game` state and consume `game.events`.
 
 import {
-  parseRoom, boxesAt, isSolidPoint, lineOfSight, flowField, flowStep, tileAt,
+  parseRoom, boxesAt, isSolidPoint, lineOfSight, flowField, flowStep, tileAt, standTile,
   FLOOR, VOID, DOOR,
 } from './room.js';
 import {
@@ -261,7 +261,7 @@ export class Game {
 
     this.plFieldT -= dt;
     if (this.plFieldT <= 0 || !this.plField) {
-      this.plField = flowField(room, [[Math.floor(this.player.x), Math.floor(this.player.z)]]);
+      this.plField = flowField(room, [standTile(room, this.player.x, this.player.z)]);
       this.plFieldT = 0.25;
     }
 
@@ -932,7 +932,8 @@ export class Game {
     const pl = this.player;
     const tx = Math.floor(e.x), tz = Math.floor(e.z);
     let gx, gz;
-    if (tx === Math.floor(pl.x) && tz === Math.floor(pl.z)) { gx = pl.x; gz = pl.z; }
+    const [px, pz] = standTile(this.room, pl.x, pl.z);
+    if (tx === px && tz === pz) { gx = pl.x; gz = pl.z; }
     else {
       const step = this.plField && flowStep(this.room, this.plField, e.x, e.z);
       if (step) [gx, gz] = step;

@@ -106,7 +106,8 @@ export function animateWalk(h, walkT, moving, t) {
   }
 }
 
-export const PLAYER_COLORS = { torso: 0xd9786b, legs: 0xb85a52, arms: 0xd9786b, skin: 0xf0c8a0, hair: 0xe0c060, shoes: 0x333333, visor: 0x66ddff, pack: 0x777788 };
+// The courier: grey suit with coral-red sleeves and legs, blond hair.
+export const PLAYER_COLORS = { torso: 0x8c8c8c, legs: 0xee4848, arms: 0xee4848, skin: 0xba8261, hair: 0xd8c878, shoes: 0x792020 };
 
 const SURVIVOR_PALETTES = [
   { torso: 0x3f7fd0, legs: 0x2b3555, skin: 0xe8c09a, hair: 0x2a1a10 },
@@ -198,23 +199,54 @@ export function dgenModel() {
 export function propModel(kind) {
   const g = new THREE.Group();
   switch (kind) {
-    case 'desk':
-      g.add(part(geo.box, 0x6a6a72, null, 0.8, 0.36, 0.62, 0, 0.18, 0));
-      g.add(part(geo.box, 0x8a8a94, null, 0.84, 0.05, 0.66, 0, 0.38, 0));
-      g.add(part(geo.box, 0x222230, null, 0.08, 0.24, 0.3, -0.12, 0.53, 0.05));
-      g.add(part(geo.box, 0x30c070, { emissive: 0x106030 }, 0.01, 0.18, 0.24, -0.075, 0.54, 0.05));
-      g.add(part(geo.box, 0xd0d0c0, null, 0.2, 0.02, 0.14, 0.18, 0.41, -0.15));
+    case 'desk': {
+      // Office desk: green lamp, an open book, loose papers and a blue in-tray, with a blue chair
+      // pulled up to the front (+x).
+      deskFrame(g);
+      const lamp = new THREE.Group();
+      lamp.position.set(-0.2, 0.42, -0.24);
+      lamp.add(part(geo.box, 0x2f8a46, null, 0.1, 0.02, 0.1, 0, 0.01, 0));
+      lamp.add(rot(part(geo.box, 0x3faa5a, null, 0.025, 0.24, 0.025, 0.05, 0.11, 0), 'z', -0.45));
+      lamp.add(rot(part(geo.box, 0x3faa5a, null, 0.025, 0.16, 0.025, 0.16, 0.2, 0), 'z', 1.1));
+      lamp.add(rot(part(geo.cone, 0x5fd27a, null, 0.12, 0.1, 0.12, 0.24, 0.16, 0), 'z', 0.5));
+      g.add(lamp);
+      g.add(part(geo.box, 0xd030c0, null, 0.22, 0.02, 0.16, 0.02, 0.43, -0.06));
+      g.add(part(geo.box, 0xe8e8e8, null, 0.2, 0.02, 0.14, 0.02, 0.445, -0.06));
+      g.add(rot(part(geo.box, 0xd0d2d0, null, 0.16, 0.012, 0.13, 0.08, 0.428, 0.2), 'y', 0.3));
+      g.add(part(geo.box, 0x4a68e0, null, 0.16, 0.14, 0.16, -0.24, 0.49, 0.18));
+      g.add(part(geo.box, 0x8098e8, null, 0.12, 0.01, 0.12, -0.24, 0.565, 0.18));
+      const chair = chairModel();
+      chair.position.set(0.06, 0, 0.36);
+      chair.rotation.y = -Math.PI / 2;
+      g.add(chair);
       break;
-    case 'plant':
-      g.add(part(geo.cyl, 0x8a4a2a, null, 0.36, 0.28, 0.36, 0, 0.14, 0));
-      g.add(part(geo.cone, 0x2f8a3a, null, 0.5, 0.55, 0.5, 0, 0.55, 0));
-      g.add(part(geo.cone, 0x3faa4a, null, 0.36, 0.42, 0.36, 0, 0.82, 0));
+    }
+    case 'chair':
+      g.add(chairModel());
       break;
+    case 'plant': {
+      // Leafy pot plant: fronds fanning out of a grey pot.
+      g.add(part(geo.cylLo, 0x5a5a60, null, 0.3, 0.26, 0.3, 0, 0.13, 0));
+      g.add(part(geo.cylLo, 0x2a1a10, null, 0.26, 0.02, 0.26, 0, 0.26, 0));
+      const greens = [0x2f8a3a, 0x1f6a2a, 0x3faa4a];
+      for (let i = 0; i < 11; i++) {
+        const pivot = new THREE.Group();
+        pivot.position.y = 0.26;
+        pivot.rotation.y = i * 2.4;
+        pivot.rotation.z = 0.35 + (i % 3) * 0.3 + (i < 3 ? 0.6 : 0);
+        pivot.add(part(geo.box, greens[i % 3], null, 0.42 - (i % 3) * 0.06, 0.025, 0.09, 0.19, 0, 0));
+        g.add(pivot);
+      }
+      break;
+    }
     case 'cabinet':
-      g.add(part(geo.box, 0x50607a, null, 0.72, 0.62, 0.72, 0, 0.31, 0));
-      g.add(part(geo.box, 0x70809a, null, 0.74, 0.04, 0.74, 0, 0.63, 0));
-      g.add(part(geo.box, 0x303848, null, 0.01, 0.04, 0.3, 0.365, 0.45, 0));
-      g.add(part(geo.box, 0x303848, null, 0.01, 0.04, 0.3, 0.365, 0.25, 0));
+      // Filing cabinet: dark grey with two drawers facing +x.
+      g.add(part(geo.box, 0x48484c, null, 0.62, 0.66, 0.66, 0, 0.33, 0));
+      g.add(part(geo.box, 0x5a5a5e, null, 0.64, 0.03, 0.68, 0, 0.675, 0));
+      for (const y of [0.2, 0.46]) {
+        g.add(part(geo.box, 0x2a2a2e, null, 0.01, 0.02, 0.56, 0.315, y + 0.12, 0));
+        g.add(part(geo.box, 0xa0a0a0, null, 0.02, 0.03, 0.14, 0.32, y, 0));
+      }
       break;
     case 'crate':
       g.add(part(geo.box, 0xa07038, null, 0.7, 0.55, 0.7, 0, 0.275, 0));
@@ -245,27 +277,75 @@ export function propModel(kind) {
   return g;
 }
 
+// Grey desk shared by desks and terminals: a thick top on solid end panels, dark underneath.
+// The long side runs along x, or along z for a desk worked from the +x side.
+function deskFrame(g, alongZ) {
+  const L = 0.9, D = 0.7;
+  const [sx, sz] = alongZ ? [D, L] : [L, D];
+  g.add(part(geo.box, 0x6a6a6a, null, sx, 0.08, sz, 0, 0.38, 0));
+  for (const s of [-1, 1]) {
+    if (alongZ) g.add(part(geo.box, 0x7a7a7a, null, D - 0.08, 0.34, 0.07, 0, 0.17, s * (L / 2 - 0.05)));
+    else g.add(part(geo.box, 0x7a7a7a, null, 0.07, 0.34, D - 0.08, s * (L / 2 - 0.05), 0.17, 0));
+  }
+  g.add(part(geo.box, 0x080808, null, sx - 0.18, 0.32, sz - 0.18, 0, 0.17, 0));
+}
+
+// Blue office chair facing -x, toward a desk.
+function chairModel() {
+  const g = new THREE.Group();
+  const c = 0x4a68e0;
+  g.add(part(geo.box, c, null, 0.2, 0.04, 0.22, 0, 0.22, 0));
+  g.add(part(geo.box, c, null, 0.04, 0.26, 0.22, 0.09, 0.37, 0));
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) g.add(part(geo.box, 0x3a54c0, null, 0.03, 0.2, 0.03, sx * 0.08, 0.1, sz * 0.09));
+  return g;
+}
+
+// Green screen: rows of amber text on black, shared by every terminal.
+let termTex = null;
+function terminalTexture() {
+  if (termTex) return termTex;
+  const c = document.createElement('canvas');
+  c.width = 12; c.height = 9;
+  const g = c.getContext('2d');
+  g.fillStyle = '#000000'; g.fillRect(0, 0, 12, 9);
+  g.fillStyle = '#d8a030';
+  for (const [x, y, w] of [[2, 2, 3], [6, 2, 4], [2, 4, 5], [8, 4, 2], [2, 6, 2], [5, 6, 4]]) g.fillRect(x, y, w, 1);
+  termTex = new THREE.CanvasTexture(c);
+  termTex.colorSpace = THREE.SRGBColorSpace;
+  termTex.magFilter = termTex.minFilter = THREE.NearestFilter;
+  termTex.generateMipmaps = false;
+  return termTex;
+}
+
 export function terminalModel() {
   const g = new THREE.Group();
-  g.add(part(geo.box, 0x55555e, null, 0.7, 0.38, 0.55, 0, 0.19, 0));
-  g.add(part(geo.box, 0x2a2a34, null, 0.32, 0.36, 0.42, -0.05, 0.56, 0));
-  const scr = part(geo.box, 0x40ff80, { emissive: 0x20c050 }, 0.01, 0.26, 0.34, 0.115, 0.58, 0);
-  scr.material = scr.material.clone(); // blinks per terminal
+  deskFrame(g, true);
+  g.add(part(geo.box, 0x3faa5a, null, 0.28, 0.26, 0.34, -0.12, 0.55, 0));
+  const scr = new THREE.Mesh(geo.plane, new THREE.MeshBasicMaterial({ map: terminalTexture() })); // dims per terminal
+  scr.scale.set(0.26, 0.19, 1);
+  scr.position.set(0.021, 0.56, 0);
+  scr.rotation.y = Math.PI / 2;
   g.add(scr);
-  g.add(part(geo.box, 0x99999f, null, 0.2, 0.03, 0.4, 0.22, 0.4, 0));
+  g.add(part(geo.box, 0x3faa5a, null, 0.14, 0.025, 0.32, 0.2, 0.432, 0));
   return { group: g, screen: scr };
 }
 
+// Tracker: a fat green periscope rising out of a black hole with a blue rim. The pipe bends over at
+// the top into a short barrel with a red lens. The head turns to aim and sinks into the hole when
+// switched off.
 export function turretModel() {
   const g = new THREE.Group();
-  g.add(part(geo.cyl, 0x2f7a3a, null, 0.5, 0.18, 0.5, 0, 0.09, 0));
-  const neck = part(geo.cyl, 0x3fa04a, null, 0.16, 0.45, 0.16, 0, 0.38, 0);
+  g.add(part(geo.box, 0x5a6ad0, { basic: true }, 0.8, 0.004, 0.8, 0, 0.002, 0));
+  g.add(part(geo.box, 0x000000, { basic: true }, 0.7, 0.006, 0.7, 0, 0.003, 0));
+  const neck = part(geo.cyl, 0x2f7a44, null, 0.38, 0.03, 0.38, 0, 0.015, 0);
   g.add(neck);
   const head = new THREE.Group();
-  head.position.y = 0.62;
-  head.add(part(geo.sphere, 0x3fa04a, null, 0.32, 0.26, 0.32, 0, 0, 0));
-  head.add(rot(part(geo.cyl, 0x2a6a32, null, 0.1, 0.32, 0.1, 0.2, 0, 0), 'z', Math.PI / 2));
-  const eye = part(geo.sphereLo, 0xff2020, { emissive: 0xff0000 }, 0.1, 0.1, 0.1, 0.15, 0.08, 0);
+  const green = 0x58c272, R = 0.32, Y = 0.58;
+  head.add(part(geo.cyl, green, null, R, Y, R, 0, Y / 2, 0));
+  head.add(part(geo.sphere, green, null, R, R, R, 0, Y, 0));
+  head.add(rot(part(geo.cyl, green, null, R, 0.3, R, 0.15, Y, 0), 'z', Math.PI / 2));
+  head.add(rot(part(geo.cyl, 0x3a8a4e, null, R * 0.98, 0.02, R * 0.98, 0.3, Y, 0), 'z', Math.PI / 2));
+  const eye = rot(part(geo.cyl, 0xdd1111, { emissive: 0xff0000 }, 0.14, 0.02, 0.14, 0.315, Y, 0), 'z', Math.PI / 2);
   eye.material = eye.material.clone(); // recoloured per turret
   head.add(eye);
   g.add(head);
@@ -289,15 +369,15 @@ export function tubeModel() {
   return { group: g, rings, glass };
 }
 
+// Vent: a flat cover filling the tile, red until sealed, then green.
 export function ventModel() {
   const g = new THREE.Group();
-  g.add(part(geo.box, 0x1a1a1a, null, 0.72, 0.03, 0.72, 0, 0.015, 0));
-  const rim = new THREE.Mesh(geo.box, new THREE.MeshLambertMaterial({ color: 0xd02020, emissive: 0x801010 }));
-  rim.scale.set(0.8, 0.02, 0.8);
-  rim.position.y = 0.01;
-  g.add(rim);
-  for (let i = 0; i < 4; i++) g.add(part(geo.box, 0x555555, null, 0.62, 0.04, 0.05, 0, 0.04, -0.24 + i * 0.16));
-  return { group: g, rim };
+  const cover = new THREE.Mesh(geo.box, new THREE.MeshBasicMaterial({ color: 0xdd1111 }));
+  cover.scale.set(0.8, 0.02, 0.8);
+  cover.position.y = 0.01;
+  g.add(cover);
+  for (let i = 0; i < 3; i++) g.add(part(geo.box, 0x000000, { basic: true, transparent: true, opacity: 0.3 }, 0.6, 0.004, 0.06, 0, 0.022, -0.2 + i * 0.2));
+  return { group: g, cover };
 }
 
 export function plateModel() {

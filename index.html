@@ -10,7 +10,6 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<canvas id="sky"></canvas>
 <canvas id="game"></canvas>
 <div id="scene-label"></div>
 <div id="hud" style="display:none">
@@ -31,30 +30,6 @@
 <div id="overlay"></div>
 <div id="ui"></div>
 <noscript>This game needs JavaScript and WebGL.</noscript>
-<script>
-  // Night-sky backdrop with a distant skyline, drawn once behind the WebGL canvas.
-  (function () {
-    const c = document.getElementById('sky');
-    function draw() {
-      const w = c.width = innerWidth, h = c.height = innerHeight;
-      const g = c.getContext('2d');
-      const grd = g.createLinearGradient(0, 0, 0, h);
-      grd.addColorStop(0, '#000000'); grd.addColorStop(0.7, '#04040c'); grd.addColorStop(1, '#0b0b1e');
-      g.fillStyle = grd; g.fillRect(0, 0, w, h);
-      for (let i = 0; i < 140; i++) { g.fillStyle = 'rgba(255,255,255,' + (Math.random() * 0.35) + ')'; g.fillRect(Math.random() * w, Math.random() * h * 0.6, 1, 1); }
-      let x = 0;
-      while (x < w) {
-        const bw = 20 + Math.random() * 50, bh = h * (0.06 + Math.random() * 0.16);
-        g.fillStyle = '#06060f'; g.fillRect(x, h - bh, bw, bh);
-        for (let y = h - bh + 4; y < h; y += 6) for (let xx = x + 3; xx < x + bw - 3; xx += 5)
-          if (Math.random() < 0.18) { g.fillStyle = Math.random() < 0.5 ? 'rgba(220,190,90,.5)' : 'rgba(90,120,220,.45)'; g.fillRect(xx, y, 2, 2); }
-        x += bw + Math.random() * 6;
-      }
-    }
-    draw();
-    addEventListener('resize', draw);
-  })();
-</script>
 <script type="module" src="src/main.js"></script>
 </body>
 </html>
